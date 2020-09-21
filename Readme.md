@@ -2,10 +2,10 @@
 
 ## Directory Layout
 
-- The `data` folder that contains the time series data in the `parquet` file format.
 - The `backtesting` folder contains the `BacktestingSlices` class and the unit test class `TestBacktestingSlices`.
 - The `notebook` folder includes a Jupyter notebook where one can examine the given time series and possibly examine the results of his implementation.
 
+We have added a class `ArtificialDatasets`. The method `create_multiple_timeseriesset` in this class will create the artificial dataset for this task.
 
 ## What to do?
 
@@ -34,10 +34,12 @@ Use your favorite Python IDE for your implementation task. We are using the IDE 
 
 #### Step 3: Perform unit tests on your implementation
 
+We have included two unit tests in `backtesting_slices_test.py`. 
 
 #### Step 4: Push your solution to your favorite repository
 
-The original repository is used as the base repository for applicant tasks and no solutions should be pushed there. . Therefore, please create an own repository for your solution and push it there. 
+The original repository is used as the base repository for applicant tasks and no solutions should be pushed there. 
+Therefore, please create an own repository for your solution and push it there. 
 
 #### Step 5: Clean your environment (optional)
 
