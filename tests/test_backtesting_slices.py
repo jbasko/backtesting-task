@@ -1,3 +1,4 @@
+import pandas as pd
 import pytest
 
 from backtesting.artificial_datasets import ArtificialDatasets
@@ -14,7 +15,7 @@ def test_create_training_end_times(mts_set):
     bt_slice = BacktestingSlices(training_length=5, forecasting_length=3, skip_length=1)
     training_end_times = bt_slice.create_training_end_times(df)
     assert len(training_end_times) == 3
-    assert training_end_times == ["2017-01-05", "2017-01-06", "2017-01-07"]
+    assert training_end_times == [pd.Timestamp("2017-01-05"), pd.Timestamp("2017-01-06"), pd.Timestamp("2017-01-07")]
 
 
 def test_materialize_slice(mts_set):
