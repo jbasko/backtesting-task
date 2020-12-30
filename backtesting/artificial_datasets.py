@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
 
-class ArtificialDatasets(object):
+
+class ArtificialDatasets:
+
     @classmethod
     def _create_series(self, length=10, start_date="2017-01-01", freq="1D"):
         df = pd.DataFrame(pd.date_range(start_date, periods=length, freq=freq, name="index"))
