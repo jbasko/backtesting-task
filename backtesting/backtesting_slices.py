@@ -1,5 +1,5 @@
 import collections
-from typing import List
+from typing import List, Dict
 
 import pandas as pd
 
@@ -7,6 +7,8 @@ ONE_DAY = pd.Timedelta(value=1, unit="day")
 
 
 class BacktestingSlices:
+
+    # TODO What is skip_length? It is not taken into consideration anywhere.
 
     def __init__(self, training_length: int = 5, forecasting_length: int = 2, skip_length: int = 2):
         self.training_length = training_length
@@ -43,6 +45,13 @@ class BacktestingSlices:
             if s["length"] >= required_length:
                 yield dict(key=sk, **s)
 
+    def iter_contiguous_slice_end_times(self, s: Dict):
+        yield from pd.date_range(
+            start=s["first"] + pd.Timedelta(value=self.training_length - 1, unit="day"),
+            end=s["last"] - pd.Timedelta(value=self.forecasting_length, unit="day"),
+            freq="1D",
+        )
+
     def create_training_end_times(self, df: pd.DataFrame) -> List[pd.Timestamp]:
         """
         The given parameters, training_length, forecasting_length, and skip_length and the training end time gives a
@@ -54,12 +63,7 @@ class BacktestingSlices:
         end_times = set()
 
         for s in self.iter_contiguous_slices(df):
-            for ts in pd.date_range(
-                start=s["first"] + pd.Timedelta(value=self.training_length - 1, unit="day"),
-                end=s["last"] - pd.Timedelta(value=self.forecasting_length, unit="day"),
-                freq="1D",
-            ):
-                end_times.add(ts)
+            end_times.update(self.iter_contiguous_slice_end_times(s))
 
         return sorted(end_times)
 
@@ -71,4 +75,26 @@ class BacktestingSlices:
         :return: Returns two DataFrames, train and test.
         The train DataFrame ends training_end_time and the test DataFrame starts at training_end_time + 1 day
         """
-        raise NotImplementedError()
+
+        # TODO depending on what skip_length is these might have to change
+
+        test_keys = set()
+        training_keys = set()
+        for s in self.iter_contiguous_slices(df):
+            for et in self.iter_contiguous_slice_end_times(s):
+                if et == training_end_time:
+                    for t in pd.date_range(
+                        start=training_end_time - pd.Timedelta(days=self.training_length - 1),
+                        end=training_end_time,
+                        freq="1D",
+                    ):
+                        training_keys.add((s["key"], t))
+                    for t in pd.date_range(
+                        start=training_end_time + pd.Timedelta(days=1),
+                        end=training_end_time + pd.Timedelta(days=self.forecasting_length),
+                        freq="1D",
+                    ):
+                        test_keys.add((s["key"], t))
+
+        return df[df.index.isin(training_keys)], df[df.index.isin(test_keys)]
+
