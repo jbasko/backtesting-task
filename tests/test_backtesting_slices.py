@@ -22,6 +22,7 @@ def test_materialize_slice(mts_set):
     df = mts_set
     bt_slice = BacktestingSlices(training_length=5, forecasting_length=3, skip_length=1)
     training_end_times = bt_slice.create_training_end_times(df)
+
     train_slice_1, test_slice_1 = bt_slice.materialize_slice(df, training_end_times[0])
     keys = train_slice_1.reset_index()["key"].drop_duplicates().tolist()
     assert len(train_slice_1) + len(test_slice_1) == 16
@@ -33,6 +34,6 @@ def test_materialize_slice(mts_set):
     assert keys == ["A", "D"]
 
     train_slice_3, test_slice_3 = bt_slice.materialize_slice(df, training_end_times[2])
-    keys = train_slice_1.reset_index()["key"].drop_duplicates().tolist()
+    keys = train_slice_3.reset_index()["key"].drop_duplicates().tolist()
     assert len(train_slice_3) + len(test_slice_3) == 16
     assert keys == ["A", "C"]

@@ -97,4 +97,3 @@ class BacktestingSlices:
                         test_keys.add((s["key"], t))
 
         return df[df.index.isin(training_keys)], df[df.index.isin(test_keys)]
-
